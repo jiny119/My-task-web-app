@@ -1,133 +1,178 @@
 import streamlit as st
+import webbrowser
 
-# Fake database (For storing users, coins, referrals, and clicks)
-users_db = {}
-user_coins = {"test_user": 20000}  # Example user with 20,000 coins
-user_referrals = {"test_user": 10}
-user_clicks = {"test_user": 5}
+# --- Fake Databases ---
+users_db = {}            # {username: password}
+user_coins = {}          # {username: coin_balance}
+user_referrals = {}      # {username: referrals_count}
+user_clicks = {}         # {username: clicks_count}
 
-# Session Management
+# --- Session Management ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "username" not in st.session_state:
     st.session_state.username = ""
-
 if "theme" not in st.session_state:
     st.session_state.theme = "Light"
 
-# 📌 Sign Up Page
-def signup():
-    st.subheader("🔹 Create a New Account")
+# ---------------------------
+# Sign Up Page
+# ---------------------------
+def signup_page():
+    st.title("Create a New Account")
     new_user = st.text_input("Username")
-    new_password = st.text_input("Password", type="password")
-
+    new_pass = st.text_input("Password", type="password")
     if st.button("Sign Up"):
         if new_user in users_db:
             st.warning("⚠️ Username already exists! Try another.")
         else:
-            users_db[new_user] = new_password
-            user_coins[new_user] = 0  # New user starts with 0 coins
+            # Create new user
+            users_db[new_user] = new_pass
+            user_coins[new_user] = 0
             user_referrals[new_user] = 0
             user_clicks[new_user] = 0
-            st.success("✅ Account created successfully! Now log in.")
+            st.success("✅ Account created successfully! Please log in now.")
 
-# 📌 Login Page
-def login():
-    st.subheader("🔹 Log In to Your Account")
-    username = st.text_input("Username")
+# ---------------------------
+# Login Page
+# ---------------------------
+def login_page():
+    st.title("Log In")
+    user = st.text_input("Username")
     password = st.text_input("Password", type="password")
-
     if st.button("Log In"):
-        if username in users_db and users_db[username] == password:
+        if user in users_db and users_db[user] == password:
             st.session_state.logged_in = True
-            st.session_state.username = username
-            st.success(f"✅ Welcome, {username}!")
+            st.session_state.username = user
+            st.success(f"✅ Welcome, {user}!")
         else:
             st.error("❌ Invalid username or password.")
 
-# 📌 Settings Page
-def settings():
-    st.subheader("⚙ Settings")
+# ---------------------------
+# Settings Page
+# ---------------------------
+def settings_page():
+    st.title("Settings")
 
-    # 🎨 Theme Change
-    theme = st.selectbox("🔹 Choose Theme", ["Light", "Dark", "Blue"])
-    st.session_state.theme = theme
-    st.success(f"✅ Theme changed to {theme}!")
+    # Theme Change
+    theme_choice = st.selectbox("Select Theme", ["Light", "Dark", "Blue"])
+    st.session_state.theme = theme_choice
+    st.success(f"Theme changed to {theme_choice}!")
 
-    # 💰 Withdrawal System
+    # Withdrawal System
     st.subheader("💸 Withdraw Earnings")
     username = st.session_state.username
     coins = user_coins.get(username, 0)
-    referrals = user_referrals.get(username, 0)
+    refs = user_referrals.get(username, 0)
     clicks = user_clicks.get(username, 0)
 
-    st.write(f"💰 Your Balance: {coins} Coins")
-    st.write(f"👥 Referrals: {referrals}/10")
-    st.write(f"🖱 Clicks: {clicks}/5")
+    st.write(f"**Your Balance:** {coins} coins")
+    st.write(f"**Referrals:** {refs}/10")
+    st.write(f"**Clicks:** {clicks}/5")
+    st.write("**Minimum:** 15000 coins + 10 referrals + 5 clicks required for withdrawal.")
 
-    if coins >= 15000 and referrals >= 10 and clicks >= 5:
-        amount = st.number_input("Enter amount to withdraw", min_value=15000, step=500)
-        payment_method = st.selectbox("Select Payment Method", ["JazzCash", "EasyPaisa", "Payoneer", "PayPal"])
+    if coins >= 15000 and refs >= 10 and clicks >= 5:
+        withdraw_amount = st.number_input("Enter amount to withdraw", min_value=15000, max_value=coins, step=500)
+        method = st.selectbox("Select Payment Method", ["JazzCash", "EasyPaisa", "Payoneer", "PayPal"])
         if st.button("Request Withdrawal"):
-            st.success(f"✅ Withdrawal request of {amount} coins via {payment_method} submitted!")
+            st.success(f"✅ Withdrawal request of {withdraw_amount} coins via {method} submitted!")
     else:
-        st.warning("⚠️ Minimum 15,000 coins, 10 referrals, and 5 clicks required for withdrawal.")
+        st.warning("⚠️ You do not meet the withdrawal requirements yet.")
 
-    # 🔴 Logout Button
-    if st.button("🔴 Logout"):
+    # Logout Button
+    if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = ""
         st.success("✅ Logged out successfully!")
 
-# 📌 Task Page
+# ---------------------------
+# Task Page
+# ---------------------------
 def task_page():
-    st.title("🎯 Earn & Win Tasks")
-    
-    # 📌 Settings Icon (Top Right Corner)
+    st.title("🎯 Earn & Win App")
+
+    # Settings Icon (Top Right Corner)
     st.markdown(
         """
         <div style="position: fixed; top: 10px; right: 10px;">
             <a href="?page=settings">
-                <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" width="40">
+                <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" width="40" />
             </a>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.write("Complete tasks and earn rewards!")
+    st.write("Complete tasks below to earn coins:")
 
     username = st.session_state.username
 
-    if st.button("🎮 Play & Earn"):
+    # --- Tasks ---
+
+    # 1) Complete Survey (YouTube Channel + Video)
+    if st.button("Complete Survey & Earn"):
+        # Open Channel
+        webbrowser.open_new_tab("https://www.youtube.com/@ToonCraftStudio-f7o?sub_confirmation=1")
+        st.success("Please Subscribe, then watch the video!")
+        # After subscription
+        if st.button("Watch Video"):
+            webbrowser.open_new_tab("https://youtu.be/trr3AC1jiEk?si=CKMZeDaMnLhFRUJ6")
+            user_coins[username] += 20
+            st.success("✅ You earned 20 coins for completing the survey!")
+
+    # 2) Play Game & Earn
+    if st.button("Play Game & Earn"):
+        # Free test game link
+        webbrowser.open_new_tab("https://poki.com/en/g/gumball-darwin-s-yearbook")
         user_coins[username] += 5
         st.success("✅ You earned 5 coins!")
 
-    if st.button("📥 Install App & Earn"):
+    # 3) Install App & Earn
+    if st.button("Install App & Earn"):
+        # Free test app link
+        webbrowser.open_new_tab("https://play.google.com/store/apps/details?id=com.spotify.music")
         user_coins[username] += 5
         st.success("✅ You earned 5 coins!")
 
-    if st.button("▶️ Watch Ad & Earn"):
+    # 4) Watch Ads & Earn (Placeholder)
+    if st.button("Watch Ads & Earn"):
+        st.warning("⚠️ AdSense Approval needed. For now, pretend you watched an ad.")
         user_coins[username] += 5
-        st.success("✅ You earned 5 coins!")
+        st.success("✅ You earned 5 coins for watching ads!")
 
-    if st.button("📊 Complete Survey & Earn"):
-        user_coins[username] += 20
-        st.success("✅ You earned 20 coins!")
-
-    if st.button("🔗 Refer a Friend & Earn 5 Coins"):
+    # 5) Referral
+    if st.button("Refer a Friend & Earn"):
         user_referrals[username] += 1
         user_coins[username] += 5
-        st.success("✅ You earned 5 coins for a referral!")
+        st.success("✅ You earned 5 coins for referral!")
 
-    if st.button("🖱 Click Ads & Earn 5 Coins"):
+    # 6) Click Ads & Earn
+    if st.button("Click Ads & Earn"):
         user_clicks[username] += 1
         user_coins[username] += 5
-        st.success("✅ You earned 5 coins for clicking an ad!")
+        st.success("✅ You earned 5 coins for clicking ads!")
 
-# 📌 Page Navigation
-if not st.session_state.logged_in:
-    login()
-elif "page" in st.session_state and st.session_state.page == "settings":
-    settings()
-else:
-    task_page()
+# ---------------------------
+# Navigation Logic
+# ---------------------------
+def main():
+    # Check if user is logged in
+    query_params = st.experimental_get_query_params()
+    page = query_params.get("page", [""])[0]
+
+    if not st.session_state.logged_in:
+        # Show Sign Up / Login options
+        choice = st.sidebar.radio("Menu", ["Login", "Sign Up"])
+        if choice == "Login":
+            login_page()
+        else:
+            signup_page()
+    else:
+        if page == "settings":
+            settings_page()
+        else:
+            task_page()
+
+# Run the app
+if __name__ == "__main__":
+    main()
