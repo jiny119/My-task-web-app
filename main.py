@@ -3,27 +3,28 @@ import webbrowser
 
 st.title("💰 Earn & Win App")
 
-# Survey Button
+# Complete Survey
 st.subheader("📊 Complete Survey & Subscribe to Continue")
+st.write("Click the button below to visit and subscribe to continue.")
 if st.button("Complete Survey"):
-    webbrowser.open_new_tab("https://www.youtube.com/@ToonCraftStudio-f7o")
-    st.warning("🔔 Please Subscribe First! Then Click Done.")
-    if st.button("Done ✅"):
-        st.success("✅ Survey Completed Successfully!")
+    webbrowser.open_new_tab("https://www.youtube.com/@ToonCraftStudio-f7o")  # Replace with your channel link
 
-# Game Play Button
+# Play Game & Earn
 st.subheader("🎮 Play & Earn")
+st.write("Play a game and earn rewards!")
 if st.button("Play Game"):
-    webbrowser.open_new_tab("https://poki.com/")  # Replace with your earning game link
+    webbrowser.open_new_tab("https://poki.com/")  # Replace with a real earning game link
 
-# App Install Button
+# Install App & Earn
 st.subheader("📱 Install App & Earn")
+st.write("Install the app and earn rewards!")
 if st.button("Install App"):
-    webbrowser.open_new_tab("https://play.google.com/store/apps/details?id=com.example")  # Replace with a referral app link
+    webbrowser.open_new_tab("https://play.google.com/store/apps/details?id=com.tiktok")  # Replace with a real app link
 
-# Ads Watch Button
+# Watch Ads & Earn
 st.subheader("🎥 Watch Ads & Earn")
+st.write("Watch ads to earn coins.")
 if st.button("Watch Ad"):
-    webbrowser.open_new_tab("https://www.youtube.com/watch?v=trr3AC1jiEk")  # Replace with Ad link
+    webbrowser.open_new_tab("https://www.youtube.com/watch?v=trr3AC1jiEk")  # Replace with an ad link
 
-st.info("✨ Keep using the app and earn more rewards!")
+st.write("🔗 Share this app with friends & earn more!")
